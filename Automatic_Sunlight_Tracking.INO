@@ -29,6 +29,11 @@ bool Dvisib = true;
 bool Lvisib = true;
 bool Rvisib = true;
 
+unsigned long sunsetStartTime = 0;
+const unsigned long sunsetDelay = 10000;
+bool isDark = false;
+bool hasReset = false;
+
 //create symbols to show on lcd
 byte sun[8] = {
     0b00100,
@@ -194,6 +199,38 @@ byte sun[8] = {
     }
 }
 
+void checkSunsetAndReset(int valU, int valD, int valL, int valR) {
+  int nightThreshold = 100; // LDR values below this = dark
+  unsigned long currentMillis = millis();
+
+  if (valU < nightThreshold && valD < nightThreshold &&
+      valL < nightThreshold && valR < nightThreshold) {
+
+    if (!isDark) {
+      isDark = true;
+      sunsetStartTime = currentMillis; // Start timing
+    }
+
+    // Check if its dark within given time
+    if (isDark && !hasReset && currentMillis - sunsetStartTime >= sunsetDelay) {
+      posV = 90;
+      posH = 90;
+      v.write(posV);
+      h.write(posH);
+      hasReset = true;
+
+      lcd.setCursor(0, 1);
+      lcd.print("Sunset: Reset   ");
+    }
+
+  } else {
+    // Light returned, reset flags
+    isDark = false;
+    hasReset = false;
+  }
+}
+
+
 void loop() {
     int valU = analogRead(ldrU);
     int valD = analogRead(ldrD);
@@ -236,4 +273,6 @@ void loop() {
   h.write(posH);
 
   delay(200); // Small delay to prevent too fast motion
+
+  checkSunsetAndReset(valU, valD, valL, valR);
 }
