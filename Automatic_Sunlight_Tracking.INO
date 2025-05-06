@@ -30,7 +30,7 @@ bool Lvisib = true;
 bool Rvisib = true;
 
 unsigned long sunsetStartTime = 0;
-const unsigned long sunsetDelay = 10000;
+const unsigned long sunsetDelay = 300000;
 bool isDark = false;
 bool hasReset = false;
 
@@ -200,7 +200,7 @@ byte sun[8] = {
 }
 
 void checkSunsetAndReset(int valU, int valD, int valL, int valR) {
-  int nightThreshold = 100; // LDR values below this = dark
+  int nightThreshold = 200; // LDR values below this = dark
   unsigned long currentMillis = millis();
 
   if (valU < nightThreshold && valD < nightThreshold &&
@@ -220,7 +220,7 @@ void checkSunsetAndReset(int valU, int valD, int valL, int valR) {
       hasReset = true;
 
       lcd.setCursor(0, 1);
-      lcd.print("Sunset: Reset   ");
+      lcd.print("On Standby");
     }
 
   } else {
